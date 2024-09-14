@@ -1,26 +1,19 @@
-import requests
+import requests, json
 from .base import BaseProvider
 from ..exceptions import WorkflowExecutionError
 
-class MakeProvider(BaseProvider):
-    def __init__(self, api_key):
-        self.api_key = api_key if api_key else None
-
+class ZapierProvider(BaseProvider):
+    def __init__(self, workflow_url, method, **kwargs):
+        super().__init__(workflow_url, method, **kwargs)
+        self.zapier_url = "https://zapier.com/developer/public/api/v1/recipes/"
+    
     def execute(self, workflow_url, method="GET", data=None):
         """
-        Execute a Make.com workflow.
-        
-        :param workflow_url: The full URL of the workflow to execute
-        :param data: A dictionary containing the data to send to the workflow
-        :return: A tuple containing the response data and status code
+        Execute the workflow
         """
         headers = {
-            'Content-Type': 'application/json'
+            "Authorization": f"Bearer {self.api_key}"
         }
-        
-        if self.api_key:
-            headers['Authorization'] = f'Bearer {self.api_key}'
-
         try:
             if method == "GET":
                 response = requests.get(workflow_url, headers=headers, params=data)
@@ -31,9 +24,9 @@ class MakeProvider(BaseProvider):
             if response.status_code == 200:
                 response_data = response.json()
                 result = response_data.get('data', {})
-                return result, response_data, 200
+                return result, 200
             else:
                 raise WorkflowExecutionError(f"Workflow execution failed with status code: {response.status_code}")
 
         except requests.RequestException as e:
-            raise WorkflowExecutionError(f"Error in Make.com workflow call: {str(e)}")
+            raise WorkflowExecutionError(f"Error in Zapier workflow call: {str(e)}")
