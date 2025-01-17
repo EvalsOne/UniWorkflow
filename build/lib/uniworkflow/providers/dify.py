@@ -3,11 +3,12 @@ from .base import BaseProvider
 from ..exceptions import WorkflowExecutionError
 
 class DifyProvider(BaseProvider):
-    def __init__(self, api_key):
+    def __init__(self, api_key, timeout=120):
         if api_key is not None:
             self.api_key = api_key
         else:
             raise ValueError("API key is required")
+        self.timeout = timeout
 
     def execute(self, workflow_url, method="GET", data=None):
         """
@@ -30,9 +31,9 @@ class DifyProvider(BaseProvider):
         
         try:
             if method == "GET":
-                response = requests.get(workflow_url, headers=headers, params=payload)
+                response = requests.get(workflow_url, headers=headers, params=payload, timeout=self.timeout)
             elif method == "POST":
-                response = requests.post(workflow_url, headers=headers, json=payload)
+                response = requests.post(workflow_url, headers=headers, json=payload, timeout=self.timeout)
             response.raise_for_status()  # This will raise an HTTPError for bad responses
 
             if response.status_code == 200:

@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="uniworkflow",
-    version="0.1.1",
-    author="Your Name",
-    author_email="your.email@example.com",
+    version="0.1.5",
+    author="Quentin",
+    author_email="tagriver@gmail.com",
     description="A Python library for integrating with various workflow providers",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/uniworkflow",
+    url="https://github.com/EvalsOne/uniworkflow",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

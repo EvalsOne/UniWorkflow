@@ -2,7 +2,7 @@ import requests, json
 from .base import BaseProvider
 from ..exceptions import WorkflowExecutionError
 
-class DifyProvider(BaseProvider):
+class CozeProvider(BaseProvider):
     def __init__(self, api_key, timeout=120):
         if api_key is not None:
             self.api_key = api_key
@@ -12,7 +12,7 @@ class DifyProvider(BaseProvider):
 
     def execute(self, workflow_url, method="GET", data=None):
         """
-        Execute a Make.com workflow.
+        Execute a Coze.com workflow.
         
         :param workflow_url: The full URL of the workflow to execute
         :param data: A dictionary containing the data to send to the workflow
@@ -23,10 +23,14 @@ class DifyProvider(BaseProvider):
             'Content-Type': 'application/json'
         }
         inputs = {key: value for key, value in data.items() if key not in []}
+
+        # extract workflow_id from workflow_url
+        workflow_id = workflow_url.split('#')[-1]
+        # remove workflow_id from workflow_url
+        workflow_url = workflow_url.replace(f"#{workflow_id}", "")
         payload = {
-            'inputs': inputs,
-            'response_mode': "blocking",
-            'user': "workflow-user"
+            'workflow_id': workflow_id,
+            'parameters': inputs
         }
         
         try:
@@ -35,13 +39,18 @@ class DifyProvider(BaseProvider):
             elif method == "POST":
                 response = requests.post(workflow_url, headers=headers, json=payload, timeout=self.timeout)
             response.raise_for_status()  # This will raise an HTTPError for bad responses
-
             if response.status_code == 200:
                 response_data = response.json()
-                output = response_data.get('data', {}).get('outputs', {})
-                return output, response_data, 200                
+                raw_data = response_data.get('data', {})
+                output_data = json.loads(raw_data).get("data", {})
+                try:
+                    output_data = json.loads(output_data)
+                except:
+                    output_data = output_data
+
+                return output_data, response_data, 200                
             else:
                 raise WorkflowExecutionError(f"Workflow execution failed with status code: {response.status_code}")
 
         except requests.RequestException as e:
-            raise WorkflowExecutionError(f"Error in Dify workflow call: {str(e)}")
+            raise WorkflowExecutionError(f"Error in Coze workflow call: {str(e)}")

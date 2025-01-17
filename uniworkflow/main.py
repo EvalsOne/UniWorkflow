@@ -2,6 +2,8 @@
 
 from .providers.make import MakeProvider
 from .providers.dify import DifyProvider
+from .providers.n8n import N8nProvider
+from .providers.coze import CozeProvider
 # from .providers.zapier import ZapierProvider
 from .exceptions import ProviderNotFoundError, WorkflowExecutionError
 
@@ -9,6 +11,8 @@ class UniwWorkflow:
     providers = {
         "make": MakeProvider,
         "dify": DifyProvider,
+        "n8n": N8nProvider,
+        "coze": CozeProvider,
         # "zapier": ZapierProvider
     }
 
@@ -26,23 +30,30 @@ class UniwWorkflow:
 
         provider_class = cls.providers[provider_name]
         
-        # Extract API key from kwargs
+        # Extract API key and timeout from kwargs
         api_key = kwargs.pop('api_key', None)
+        timeout = kwargs.pop('timeout', 120)
         
         if not workflow_url:
             raise ValueError("Workflow URL is required")
         
         if not method:
             raise ValueError("Method is required")
+        
+        # convert method to uppercase
+        method = method.upper()
+        if method not in ["GET", "POST", "PUT", "DELETE"]:
+            raise ValueError("Invalid method")
 
-        # Initialize provider
-        provider = provider_class(api_key)
+        # Initialize provider with timeout
+        provider = provider_class(api_key, timeout)
 
         try:
             # Execute the workflow
             result, response_data, status_code = provider.execute(workflow_url=workflow_url, method=method, **kwargs)
             return result, response_data, status_code
         except Exception as e:
+            print(e)
             raise WorkflowExecutionError(f"Error executing workflow: {str(e)}")
 
     @classmethod

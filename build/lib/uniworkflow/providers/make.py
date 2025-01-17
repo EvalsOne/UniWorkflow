@@ -3,8 +3,9 @@ from .base import BaseProvider
 from ..exceptions import WorkflowExecutionError
 
 class MakeProvider(BaseProvider):
-    def __init__(self, api_key):
+    def __init__(self, api_key, timeout=120):
         self.api_key = api_key if api_key else None
+        self.timeout = timeout
 
     def execute(self, workflow_url, method="GET", data=None):
         """
@@ -23,9 +24,9 @@ class MakeProvider(BaseProvider):
 
         try:
             if method == "GET":
-                response = requests.get(workflow_url, headers=headers, params=data)
+                response = requests.get(workflow_url, headers=headers, params=data, timeout=self.timeout)
             elif method == "POST":
-                response = requests.post(workflow_url, headers=headers, json=data)
+                response = requests.post(workflow_url, headers=headers, json=data, timeout=self.timeout)
             response.raise_for_status()  # This will raise an HTTPError for bad responses
 
             if response.status_code == 200:

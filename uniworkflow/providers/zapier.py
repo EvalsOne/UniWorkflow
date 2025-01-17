@@ -1,32 +1,44 @@
-import requests, json
+import requests
 from .base import BaseProvider
 from ..exceptions import WorkflowExecutionError
 
 class ZapierProvider(BaseProvider):
-    def __init__(self, workflow_url, method, **kwargs):
-        super().__init__(workflow_url, method, **kwargs)
-        self.zapier_url = "https://zapier.com/developer/public/api/v1/recipes/"
-    
-    def execute(self, workflow_url, method="GET", data=None):
+    def __init__(self, timeout=120):
+        self.timeout = timeout
+        pass  # No API key is required for triggering Zapier webhooks
+
+    def execute(self, webhook_url, method="POST", data=None):
         """
-        Execute the workflow
+        Execute a Zapier workflow via webhook.
+
+        :param webhook_url: The full URL of the Zapier webhook to trigger
+        :param method: The HTTP method to use ('POST' or 'GET')
+        :param data: A dictionary containing the data to send to the webhook
+        :return: A tuple containing the result, response data, and status code
         """
         headers = {
-            "Authorization": f"Bearer {self.api_key}"
+            'Content-Type': 'application/json'
         }
-        try:
-            if method == "GET":
-                response = requests.get(workflow_url, headers=headers, params=data)
-            elif method == "POST":
-                response = requests.post(workflow_url, headers=headers, json=data)
-            response.raise_for_status()  # This will raise an HTTPError for bad responses
 
-            if response.status_code == 200:
-                response_data = response.json()
-                result = response_data.get('data', {})
-                return result, 200
+        try:
+            if method.upper() == "GET":
+                response = requests.get(webhook_url, headers=headers, params=data, timeout=self.timeout)
+            elif method.upper() == "POST":
+                response = requests.post(webhook_url, headers=headers, json=data, timeout=self.timeout)
             else:
-                raise WorkflowExecutionError(f"Workflow execution failed with status code: {response.status_code}")
+                raise ValueError(f"Unsupported HTTP method: {method}")
+
+            response.raise_for_status()  # Raise HTTPError for bad responses
+
+            # Zapier webhooks typically do not return content, but we can attempt to parse
+            try:
+                response_data = response.json()
+                result = response_data.get('data', response_data)
+            except ValueError:
+                response_data = response.text
+                result = response_data
+
+            return result, response_data, response.status_code
 
         except requests.RequestException as e:
-            raise WorkflowExecutionError(f"Error in Zapier workflow call: {str(e)}")
+            raise WorkflowExecutionError(f"Error executing Zapier workflow: {str(e)}")
