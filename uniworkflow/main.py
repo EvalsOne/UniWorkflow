@@ -17,7 +17,7 @@ class UniwWorkflow:
     }
 
     @classmethod
-    def execute(cls, provider_name, workflow_url, method="GET", **kwargs):
+    def execute(cls, provider_name, workflow_url, method="GET", headers={}, **kwargs):
         """
         Execute a workflow for the specified provider.
 
@@ -50,7 +50,7 @@ class UniwWorkflow:
 
         try:
             # Execute the workflow
-            result, response_data, status_code = provider.execute(workflow_url=workflow_url, method=method, **kwargs)
+            result, response_data, status_code = provider.execute(workflow_url=workflow_url, method=method, headers=headers, **kwargs)
             return result, response_data, status_code
         except Exception as e:
             print(e)

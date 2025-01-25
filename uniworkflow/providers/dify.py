@@ -10,7 +10,7 @@ class DifyProvider(BaseProvider):
             raise ValueError("API key is required")
         self.timeout = timeout
 
-    def execute(self, workflow_url, method="GET", data=None):
+    def execute(self, workflow_url, method="GET", headers={}, data=None):
         """
         Execute a Make.com workflow.
         
@@ -18,10 +18,13 @@ class DifyProvider(BaseProvider):
         :param data: A dictionary containing the data to send to the workflow
         :return: A tuple containing the response data and status code
         """
+        
         headers = {
             'Authorization': f'Bearer {self.api_key}',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            **headers
         }
+        
         inputs = {key: value for key, value in data.items() if key not in []}
         payload = {
             'inputs': inputs,

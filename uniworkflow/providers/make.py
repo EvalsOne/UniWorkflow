@@ -7,7 +7,7 @@ class MakeProvider(BaseProvider):
         self.api_key = api_key if api_key else None
         self.timeout = timeout
 
-    def execute(self, workflow_url, method="GET", data=None):
+    def execute(self, workflow_url, method="GET", headers={}, data=None):
         """
         Execute a Make.com workflow.
         
@@ -16,9 +16,9 @@ class MakeProvider(BaseProvider):
         :return: A tuple containing the response data and status code
         """
         headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            **headers
         }
-        
         if self.api_key:
             headers['Authorization'] = f'Bearer {self.api_key}'
 

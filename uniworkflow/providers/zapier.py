@@ -7,7 +7,7 @@ class ZapierProvider(BaseProvider):
         self.timeout = timeout
         pass  # No API key is required for triggering Zapier webhooks
 
-    def execute(self, webhook_url, method="POST", data=None):
+    def execute(self, webhook_url, method="POST", headers={}, data=None):
         """
         Execute a Zapier workflow via webhook.
 
@@ -17,7 +17,8 @@ class ZapierProvider(BaseProvider):
         :return: A tuple containing the result, response data, and status code
         """
         headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            **headers
         }
 
         try:

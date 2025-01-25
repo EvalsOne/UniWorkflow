@@ -7,7 +7,7 @@ class N8nProvider(BaseProvider):
         self.api_key = api_key if api_key else None
         self.timeout = timeout
 
-    def execute(self, workflow_url, method="GET", data=None):
+    def execute(self, workflow_url, method="GET", headers={}, data=None):
         """
         Execute a N8n workflow.
         
@@ -16,7 +16,8 @@ class N8nProvider(BaseProvider):
         :return: A tuple containing the response data, response_data, and status code
         """
         headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            **headers
         }
         
         if self.api_key:
