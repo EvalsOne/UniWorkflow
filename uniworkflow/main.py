@@ -7,7 +7,7 @@ from .providers.coze import CozeProvider
 # from .providers.zapier import ZapierProvider
 from .exceptions import ProviderNotFoundError, WorkflowExecutionError
 
-class UniwWorkflow:
+class UniWorkflow:
     providers = {
         "make": MakeProvider,
         "dify": DifyProvider,
@@ -53,13 +53,12 @@ class UniwWorkflow:
             result, response_data, status_code = provider.execute(workflow_url=workflow_url, method=method, headers=headers, **kwargs)
             return result, response_data, status_code
         except Exception as e:
-            print(e)
             raise WorkflowExecutionError(f"Error executing workflow: {str(e)}")
 
     @classmethod
     def add_provider(cls, name, provider_class):
         """
-        Add a new provider to the UniwWorkflow.
+        Add a new provider to the UniWorkflow.
 
         :param name: Name of the provider
         :param provider_class: Class of the provider

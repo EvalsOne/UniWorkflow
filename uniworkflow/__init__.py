@@ -1,2 +1,2 @@
-from .main import UniwWorkflow
-__all__ = ['UniwWorkflow']
+from .main import UniWorkflow
+__all__ = ['UniWorkflow']

@@ -19,7 +19,7 @@ pip install uniworkflow
 
 ```python
 # import the library
-from uniworkflow import UniwWorkflow
+from uniworkflow import UniWorkflow
 
 # prepare the kwargs
 kwargs = {
@@ -30,7 +30,7 @@ kwargs = {
 }
 
 # Execute a workflow
-result = UniwWorkflow.execute("make", **kwargs)
+result = UniWorkflow.execute("make", **kwargs)
 
 # print the result
 print(result)
@@ -40,7 +40,7 @@ print(result)
 
 ```python
 # import the library
-from uniworkflow import UniwWorkflow
+from uniworkflow import UniWorkflow
 
 # prepare the kwargs
 kwargs = {
@@ -51,7 +51,7 @@ kwargs = {
 }
 
 # Execute a workflow
-result = UniwWorkflow.execute("dify", **kwargs) 
+result = UniWorkflow.execute("dify", **kwargs) 
 
 # print the result
 print(result)

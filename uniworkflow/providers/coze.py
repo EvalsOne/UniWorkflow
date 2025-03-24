@@ -39,19 +39,32 @@ class CozeProvider(BaseProvider):
                 response = requests.get(workflow_url, headers=headers, params=payload, timeout=self.timeout)
             elif method == "POST":
                 response = requests.post(workflow_url, headers=headers, json=payload, timeout=self.timeout)
-            response.raise_for_status()  # This will raise an HTTPError for bad responses
+            response.raise_for_status()
             if response.status_code == 200:
-                response_data = response.json()
-                raw_data = response_data.get('data', {})
-                output_data = json.loads(raw_data).get("data", {})
                 try:
-                    output_data = json.loads(output_data)
+                    response_data = response.json()
+                    raw_data = response_data.get('data', {})
+                    output_data = json.loads(raw_data).get("data", {})
+                    return output_data, response_data, 200              
                 except:
-                    output_data = output_data
-
-                return output_data, response_data, 200                
+                    return None, response.text, 422
+                  
             else:
-                raise WorkflowExecutionError(f"Workflow execution failed with status code: {response.status_code}")
+                # 首先尝试获取 text，如果失败则使用 content
+                try:
+                    error_message = response.text
+                except:
+                    error_message = response.content.decode('utf-8', errors='replace')
+                return None, error_message, response.status_code
 
         except requests.RequestException as e:
-            raise WorkflowExecutionError(f"Error in Coze workflow call: {str(e)}")
+            # 同样地，安全地获取错误信息
+            try:
+                error_message = getattr(e.response, 'text', None)
+                if error_message is None:
+                    error_message = getattr(e.response, 'content', str(e))
+                    if isinstance(error_message, bytes):
+                        error_message = error_message.decode('utf-8', errors='replace')
+            except:
+                error_message = str(e)
+            return None, error_message, 500

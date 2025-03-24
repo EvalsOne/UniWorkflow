@@ -1,11 +1,11 @@
-class UniwWorkflowException(Exception):
-    """Base exception for UniwWorkflow"""
+class UniWorkflowException(Exception):
+    """Base exception for UniWorkflow"""
     pass
 
-class ProviderNotFoundError(UniwWorkflowException):
+class ProviderNotFoundError(UniWorkflowException):
     """Raised when a provider is not found"""
     pass
 
-class WorkflowExecutionError(UniwWorkflowException):
+class WorkflowExecutionError(UniWorkflowException):
     """Raised when there's an error executing a workflow"""
     pass
